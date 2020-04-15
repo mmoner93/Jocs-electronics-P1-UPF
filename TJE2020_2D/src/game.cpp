@@ -12,6 +12,12 @@ Image minifont;
 Image sprite;
 Color bgcolor(130, 80, 100);
 
+Vector2 playerpos;
+Vector2 playerfinpos;
+Vector2 camerapos;
+int ismoving = 0;
+enum {FACE_DOWN, FACE_RIGHT, FACE_LEFT, FACE_UP};
+int facing = FACE_DOWN;
 Game::Game(int window_width, int window_height, SDL_Window* window)
 {
 	this->window_width = window_width;
@@ -48,8 +54,16 @@ void Game::render(void)
 		//framebuffer.drawLine( 0, 0, 100,100, Color::RED );		//draws a line
 		//framebuffer.drawImage( sprite, 0, 0 );					//draws full image
 		//framebuffer.drawImage( sprite, 0, 0, framebuffer.width, framebuffer.height );			//draws a scaled image
-		//framebuffer.drawImage( sprite, 0, 0, Area(0,0,14,18) );	//draws only a part of an image
-		framebuffer.drawText( "Hello World", 0, 0, font );				//draws some text using a bitmap font in an image (assuming every char is 7x9)
+    if (ismoving == 1) {
+        framebuffer.drawImage( sprite, playerpos.x + camerapos.x, playerpos.y + camerapos.y, Area((int (time * 6) % 4) * 14,facing * 18,14,18) );    //draws only a part of an image
+    }
+    else {
+        framebuffer.drawImage( sprite, playerpos.x + camerapos.x, playerpos.y + camerapos.y, Area(0,facing * 18,14,18) );    //draws only a part of an image
+        framebuffer.drawText( toString(time), 1, 10, minifont,4,6);    //draws some text using a bitmap font in an image (assuming every char is 4x6)
+    }
+    //framebuffer.drawImage( sprite, playerpos.x + camerapos.x, playerpos.y + camerapos.y, Area((int (time * 6) % 4) * 14,facing * 18,14,18) );	//draws only a part of an image
+        //framebuffer.drawImage( sprite, playerpos.x + camerapos.x, playerpos.y + camerapos.y, Area( 0,facing * 18,14,18) );    //draws only a part of an image
+		//framebuffer.drawText( "Hello World", 0, 0, font );				//draws some text using a bitmap font in an image (assuming every char is 7x9)
 		//framebuffer.drawText( toString(time), 1, 10, minifont,4,6);	//draws some text using a bitmap font in an image (assuming every char is 4x6)
 
 	//send image to screen
@@ -60,15 +74,42 @@ void Game::update(double seconds_elapsed)
 {
 	//Add here your update method
 	//...
-
+    int speed = 32;
 	//Read the keyboard state, to see all the keycodes: https://wiki.libsdl.org/SDL_Keycode
 	if (Input::isKeyPressed(SDL_SCANCODE_UP)) //if key up
 	{
+        playerfinpos.y -= speed*seconds_elapsed;
+        //camerapos.y -= speed*seconds_elapsed;
+        ismoving = 1;
+        facing = FACE_UP;
 	}
 	if (Input::isKeyPressed(SDL_SCANCODE_DOWN)) //if key down
 	{
+        playerfinpos.y += speed*seconds_elapsed;
+        //camerapos.y += speed*seconds_elapsed;
+        ismoving = 1;
+        facing = FACE_DOWN;
 	}
-
+    
+    if (Input::isKeyPressed(SDL_SCANCODE_RIGHT)) //if key up
+    {
+        playerfinpos.x += speed*seconds_elapsed;
+        //camerapos.x += speed*seconds_elapsed;
+        ismoving = 1;
+        facing = FACE_RIGHT;
+    }
+    if (Input::isKeyPressed(SDL_SCANCODE_LEFT)) //if key down
+    {
+        playerfinpos.x -= speed*seconds_elapsed;
+        //camerapos.x -= speed*seconds_elapsed;
+        ismoving = 1;
+        facing = FACE_LEFT;
+    }
+    playerpos += ( playerfinpos - playerpos ) * 0.1;
+    if (playerfinpos == playerpos) {
+        ismoving = 0;
+    }
+    
 	//example of 'was pressed'
 	if (Input::wasKeyPressed(SDL_SCANCODE_A)) //if key A was pressed
 	{
