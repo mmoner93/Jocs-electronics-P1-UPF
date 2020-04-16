@@ -2,22 +2,62 @@
 #include "utils.h"
 #include "input.h"
 #include "image.h"
-
+#include <fstream>
+#include <iostream>
 #include <cmath>
+
+using namespace std;
 
 Game* Game::instance = NULL;
 
 Image font;
 Image minifont;
 Image sprite;
+Image bgmap;
 Color bgcolor(130, 80, 100);
 
 Vector2 playerpos;
 Vector2 playerfinpos;
 Vector2 camerapos;
+Vector2 camerafinpos;
 int ismoving = 0;
 enum {FACE_DOWN, FACE_RIGHT, FACE_LEFT, FACE_UP};
 int facing = FACE_DOWN;
+const int listsize = 928 * 928;
+int mapborders [listsize];
+//std::string file = "data/map.csv";
+
+void readCSV() {
+	int pos = 0;
+	ifstream file;
+	file.open("data/house.csv", fstream::in);
+	if (!file.is_open()) {
+		cout << "Error locating the file map" << '\n';
+	}
+	int aux = 0;
+	while (file.good())
+	{
+		string line;
+
+		getline(file, line, ',');
+		//cout << line;
+		int aux;
+		istringstream(line) >> aux;
+		mapborders[pos] = aux;
+		pos += 1;
+	}
+	int actualpos = 0;
+	while (928>actualpos)
+	{
+		cout << mapborders[actualpos] << ',';
+		if (actualpos%928 == 0)
+		{
+			cout << '\n';
+		}
+		actualpos += 1;
+	}
+}
+
 Game::Game(int window_width, int window_height, SDL_Window* window)
 {
 	this->window_width = window_width;
@@ -34,6 +74,9 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	font.loadTGA("data/bitmap-font-white.tga"); //load bitmap-font image
 	minifont.loadTGA("data/mini-font-white-4x6.tga"); //load bitmap-font image
 	sprite.loadTGA("data/spritesheet.tga"); //example to load an sprite
+	bgmap.loadTGA("data/house.tga"); 
+	bgmap.flipY();
+	readCSV();
 
 	//enableAudio(); //enable this line if you plan to add audio to your application
 	//synth.playSample("data/coin.wav",1,true);
@@ -54,13 +97,9 @@ void Game::render(void)
 		//framebuffer.drawLine( 0, 0, 100,100, Color::RED );		//draws a line
 		//framebuffer.drawImage( sprite, 0, 0 );					//draws full image
 		//framebuffer.drawImage( sprite, 0, 0, framebuffer.width, framebuffer.height );			//draws a scaled image
-    if (ismoving == 1) {
-        framebuffer.drawImage( sprite, playerpos.x + camerapos.x, playerpos.y + camerapos.y, Area((int (time * 6) % 4) * 14,facing * 18,14,18) );    //draws only a part of an image
-    }
-    else {
-        framebuffer.drawImage( sprite, playerpos.x + camerapos.x, playerpos.y + camerapos.y, Area(0,facing * 18,14,18) );    //draws only a part of an image
-        framebuffer.drawText( toString(time), 1, 10, minifont,4,6);    //draws some text using a bitmap font in an image (assuming every char is 4x6)
-    }
+		framebuffer.drawImage( bgmap, 0, 0, Area(camerapos.x, camerapos.y, 160, 120));
+        framebuffer.drawImage( sprite, 80, 60, Area((int (time * 6) % 4) * 14*ismoving,facing * 18,14,18) );    //draws only a part of an image
+    
     //framebuffer.drawImage( sprite, playerpos.x + camerapos.x, playerpos.y + camerapos.y, Area((int (time * 6) % 4) * 14,facing * 18,14,18) );	//draws only a part of an image
         //framebuffer.drawImage( sprite, playerpos.x + camerapos.x, playerpos.y + camerapos.y, Area( 0,facing * 18,14,18) );    //draws only a part of an image
 		//framebuffer.drawText( "Hello World", 0, 0, font );				//draws some text using a bitmap font in an image (assuming every char is 7x9)
@@ -79,14 +118,14 @@ void Game::update(double seconds_elapsed)
 	if (Input::isKeyPressed(SDL_SCANCODE_UP)) //if key up
 	{
         playerfinpos.y -= speed*seconds_elapsed;
-        //camerapos.y -= speed*seconds_elapsed;
+        camerafinpos.y -= speed*seconds_elapsed;
         ismoving = 1;
         facing = FACE_UP;
 	}
 	if (Input::isKeyPressed(SDL_SCANCODE_DOWN)) //if key down
 	{
         playerfinpos.y += speed*seconds_elapsed;
-        //camerapos.y += speed*seconds_elapsed;
+        camerafinpos.y += speed*seconds_elapsed;
         ismoving = 1;
         facing = FACE_DOWN;
 	}
@@ -94,18 +133,19 @@ void Game::update(double seconds_elapsed)
     if (Input::isKeyPressed(SDL_SCANCODE_RIGHT)) //if key up
     {
         playerfinpos.x += speed*seconds_elapsed;
-        //camerapos.x += speed*seconds_elapsed;
+        camerafinpos.x += speed*seconds_elapsed;
         ismoving = 1;
         facing = FACE_RIGHT;
     }
     if (Input::isKeyPressed(SDL_SCANCODE_LEFT)) //if key down
     {
         playerfinpos.x -= speed*seconds_elapsed;
-        //camerapos.x -= speed*seconds_elapsed;
+        camerafinpos.x -= speed*seconds_elapsed;
         ismoving = 1;
         facing = FACE_LEFT;
     }
     playerpos += ( playerfinpos - playerpos ) * 0.1;
+	camerapos += (camerafinpos - camerapos) * 0.1;
     if (playerfinpos == playerpos) {
         ismoving = 0;
     }
