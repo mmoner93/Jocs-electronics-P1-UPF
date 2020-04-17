@@ -7,6 +7,8 @@
 #include <cmath>
 
 using namespace std;
+int debugon = 0;
+
 
 Game* Game::instance = NULL;
 
@@ -14,49 +16,313 @@ Image font;
 Image minifont;
 Image sprite;
 Image bgmap;
+Image intro;
+Image tiles;
 Color bgcolor(130, 80, 100);
 
-Vector2 playerpos;
-Vector2 playerfinpos;
 Vector2 camerapos;
 Vector2 camerafinpos;
-int ismoving = 0;
-enum {FACE_DOWN, FACE_RIGHT, FACE_LEFT, FACE_UP};
-int facing = FACE_DOWN;
-const int listsize = 928 * 928;
-int mapborders [listsize];
-//std::string file = "data/map.csv";
 
-void readCSV() {
-	int pos = 0;
-	ifstream file;
-	file.open("data/house.csv", fstream::in);
-	if (!file.is_open()) {
-		cout << "Error locating the file map" << '\n';
-	}
-	int aux = 0;
-	while (file.good())
-	{
-		string line;
+enum eCellType : uint8 { EMPTY, WALL, DOOR, OBJECT, PJ};
+enum eItemType : uint8 { NOTHING, KEY1, KEY2};
 
-		getline(file, line, ',');
-		//cout << line;
-		int aux;
-		istringstream(line) >> aux;
-		mapborders[pos] = aux;
-		pos += 1;
-	}
-	int actualpos = 0;
-	while (928>actualpos)
-	{
-		cout << mapborders[actualpos] << ',';
-		if (actualpos%928 == 0)
-		{
-			cout << '\n';
-		}
-		actualpos += 1;
-	}
+struct sCell { // no se usa aun
+    eCellType type;
+    eItemType item;
+};
+
+struct myMap {
+    int isFloor[8] = {116, 117, 118, 119, 102, 103, 104, 105};
+    int size_components[2] = { 20, 15 };
+    int size = 300;
+    sCell celdas[300];
+    int mapa[300];
+    int npcs[300];
+};
+
+struct myPlayer {//no se usa aun
+    enum {FACE_DOWN, FACE_RIGHT, FACE_LEFT, FACE_UP};
+    Vector2 actualpos = Vector2(80,60);
+    Vector2 finpos = Vector2(90,85);
+    int ismoving = 0;
+    int facing = FACE_DOWN;
+    int life;
+};
+
+struct myGameData {
+    myMap world;
+    myPlayer player;
+    int actualArea;
+    int isplaying = 0;
+};
+
+myGameData currentGame;
+
+int canMove(Vector2 position) {
+    for (int z = 0; z<8; z++) {
+        if (currentGame.world.mapa[ ((int(currentGame.player.finpos.x + 8)*20/160) ) + (20 * (int(currentGame.player.finpos.y + 16)*15/120)) ] == currentGame.world.isFloor[z]) {
+            if (debugon) {
+                std::cout << (int(position.x)*20/160) << ',' << (int(position.y)*15/120)+1;
+                std::cout << currentGame.world.mapa[ ((int(currentGame.player.finpos.x)*20/160) + 1) + (20 * (int(currentGame.player.finpos.y)*15/120) + 2) ] ;
+                std::cout << currentGame.world.isFloor[z];
+                
+            }
+            return 1;
+        }
+    }
+    std::cout << currentGame.world.mapa[ ((int(currentGame.player.finpos.x)*20/160) + 1) + (20 * (int(currentGame.player.finpos.y)*15/120) + 2) ] ;
+    return 0;
 }
+
+
+class Stage
+{
+public:
+    static std::map<std::string, Stage*> s_stages;
+    static Stage* current_stage;
+    static void changeStage (const char* name){
+        current_stage = s_stages[name];
+    }
+    
+    Stage(const char* name) {s_stages[name] = this;}
+    virtual void render(Image& fb) {}
+    virtual void update(double seconds_elapsed) {}
+    
+};
+
+Stage* Stage::current_stage = NULL;
+std::map<std::string, Stage*> Stage::s_stages;
+
+class IntroStage : public Stage
+{
+public:
+    IntroStage() : Stage("intro"){}
+    void render(Image& fb) {
+        fb.fill(Color::BLACK);
+        fb.drawImage(intro, 0, 30, 160, 120);
+        fb.drawText("Sock Mate", 50, 10, font);
+        fb.drawText("Press P to play", 50, 50, minifont,4,6);
+    }
+    
+    void update(double seconds_elapsed) {
+        if (Input::wasKeyPressed(SDL_SCANCODE_P)) {
+            changeStage("play");
+        }
+        if (Stage::current_stage == Stage::s_stages["intro"] && currentGame.isplaying == 0) {
+            Game::instance->synth.playSample("data/music.wav", 0.8, false);
+            currentGame.isplaying = 1;
+        }
+    }
+    
+};
+class PlayStage : public Stage
+{
+public:
+    PlayStage() : Stage("play") {}
+    void render(Image& fb) {
+        fb.fill(Color::GREEN);
+        fb.drawMap(tiles, currentGame.world.mapa, currentGame.world.size_components, 1);
+        fb.drawImage( sprite, currentGame.player.actualpos.x, currentGame.player.actualpos.y, Area((int (Game::instance->time * 6) % 4) * 14*currentGame.player.ismoving,currentGame.player.facing * 18,14,18) );
+        if (debugon) {
+            fb.drawImage( bgmap, 0, 0, Area(0, 0, 160, 120));
+            fb.drawImage(tiles, 0, 0);
+        }
+    }
+    void update(double seconds_elapsed) {
+        Game::instance->synth.samples_playback->stop();
+        currentGame.isplaying = 0;
+        if (Input::wasKeyPressed(SDL_SCANCODE_P)) {
+            changeStage("intro");
+        }
+        if (Input::wasKeyPressed(SDL_SCANCODE_M)) {
+            changeStage("menu");
+        }
+        int speed = 40;
+        //Read the keyboard state, to see all the keycodes: https://wiki.libsdl.org/SDL_Keycode
+        if (Input::isKeyPressed(SDL_SCANCODE_UP)) //if key up
+        {
+            currentGame.player.finpos.y -= speed*seconds_elapsed;
+            //camerafinpos.y -= speed*seconds_elapsed;
+            currentGame.player.ismoving = 1;
+            currentGame.player.facing = currentGame.player.FACE_UP;
+        }
+        if (Input::isKeyPressed(SDL_SCANCODE_DOWN)) //if key down
+        {
+            currentGame.player.finpos.y += speed*seconds_elapsed;
+            //camerafinpos.y += speed*seconds_elapsed;
+            currentGame.player.ismoving = 1;
+            currentGame.player.facing = currentGame.player.FACE_DOWN;
+        }
+        
+        if (Input::isKeyPressed(SDL_SCANCODE_RIGHT)) //if key up
+        {
+            currentGame.player.finpos.x += speed*seconds_elapsed;
+            //camerafinpos.x += speed*seconds_elapsed;
+            currentGame.player.ismoving = 1;
+            currentGame.player.facing = currentGame.player.FACE_RIGHT;
+        }
+        if (Input::isKeyPressed(SDL_SCANCODE_LEFT)) //if key down
+        {
+            currentGame.player.finpos.x -= speed*seconds_elapsed;
+            //camerafinpos.x -= speed*seconds_elapsed;
+            currentGame.player.ismoving = 1;
+            currentGame.player.facing = currentGame.player.FACE_LEFT;
+        }
+        //currentGame.player.actualpos += ( playerfinpos - currentGame.player.actualpos ) * 0.1;
+    
+        if (canMove(currentGame.player.finpos)) {
+            currentGame.player.actualpos += ( currentGame.player.finpos - currentGame.player.actualpos ) * 0.1;
+        }
+        else {
+            currentGame.player.finpos = currentGame.player.actualpos;
+        }
+        if (debugon) {
+            std::cout << (int(currentGame.player.finpos.x)*20/160) + 1 << ',' << (int(currentGame.player.finpos.y)*15/120) + 2;
+            std::cout << currentGame.world.mapa[ ((int(currentGame.player.finpos.x)*20/160) + 1) + (20 * (int(currentGame.player.finpos.y)*15/120) + 2) ] ;
+            std::cout << currentGame.world.mapa[ (11 + 20*11) ] ;
+        }
+    
+        Vector2 difpos = currentGame.player.finpos - currentGame.player.actualpos;
+        if (fabs(difpos.y) < 2 && fabs((difpos).x) < 2) {
+            currentGame.player.ismoving = 0;
+        }
+        
+
+    }
+    
+};
+
+
+
+struct sGameInfo {
+    Vector2 position;
+    int level;
+    sGameInfo(Vector2 pos, int l){
+        position = pos;
+        level = l;
+    }
+};
+
+void saveGameInfo()
+{
+    sGameInfo game_info(currentGame.player.actualpos, 1);
+    //fill here game_info with all game data
+    //...
+    //save to file
+    FILE* fp = fopen("savegame.bin","wb");
+    fwrite(&game_info, sizeof(sGameInfo),1,fp);
+    fclose(fp);
+
+}
+
+bool loadGameInfo()
+{
+    sGameInfo game_info(Vector2(0,0),1);
+
+    //load file
+    FILE* fp = fopen("savegame.bin","rb");
+    if(fp == NULL) //no savegame found
+       return false;
+
+    fread(&game_info, sizeof(sGameInfo),1,fp);
+    fclose(fp);
+
+    currentGame.player.actualpos = game_info.position;
+
+    return true;
+}
+
+
+
+class MenuStage : public Stage
+{
+public:
+    MenuStage() : Stage("menu") {}
+    int menupos = 0;
+    double initime = Game::instance->time;
+    double time = 2;
+    void render(Image& fb) {
+        //fb.fill(Color(0,0,0,130));
+        Stage::s_stages["play"]->render(fb);
+        fb.fillBlend(Color(0,0,0,180));
+        fb.drawText("Sock Mate Menu", 30, 10, font);
+        fb.drawText("I - Save Game", 50, 50, minifont,4,6);
+        fb.drawText("O - Load Game", 50, 65, minifont,4,6);
+        fb.drawText("M - Exit menu", 50, 80, minifont,4,6);
+        fb.drawText("ESC - Exit Game", 50, 95, minifont,4,6);
+        if (menupos == 1 && time < 2) {
+            fb.fillBlend(Color(0,0,0,180));
+            fb.drawText("Game Saved", 50, 60, minifont,4,6);
+            menupos = 0;
+        }
+        else if (menupos == 2 && time < 2) {
+            fb.fillBlend(Color(0,0,0,180));
+            fb.drawText("Game Loaded", 50, 60, minifont,4,6);
+            menupos = 0;
+        }
+
+        
+    }
+    void update(double seconds_elapsed) {
+
+        if (Input::wasKeyPressed(SDL_SCANCODE_M)) {
+            changeStage("play");
+        }
+        if (Input::wasKeyPressed(SDL_SCANCODE_I)) {
+            saveGameInfo();
+            menupos = 1;
+            time = 0;
+        }
+        if (Input::wasKeyPressed(SDL_SCANCODE_O)) {
+            loadGameInfo();
+            menupos = 2;
+            time = 0;
+        }
+        if (time < 2) {
+            time += Game::instance->time;
+            cout << Game::instance->time;
+            cout << " " << time;
+        }
+    }
+    
+};
+
+int * readCSV(string filesrc, int size) { //archivo y tamaño de area
+    int pos = 0;
+    int* mapborder = new int[size];
+    ifstream file;
+    file.open(filesrc, fstream::in);
+    if (!file.is_open()) {
+        fprintf(stderr, "Error locating the file map");
+    }
+    while (file.good()){
+        string line;
+        while (getline(file, line)) {   // get a whole line
+            std::stringstream ss(line);
+            while (getline(ss, line, ',')) {
+                int aux;
+                istringstream(line) >> aux;
+                mapborder[pos++] = aux;
+            }
+        }
+    }
+    int actualpos = 0;
+    while (10 * 7 > actualpos){
+        fprintf(stderr, "%d,", mapborder[actualpos]);
+        if (actualpos == 0) {
+        }
+        else if ((actualpos+1) % 10 == 0)
+        {
+            cout << '\n';
+        }
+        actualpos += 1;
+    }
+    return mapborder;
+}
+
+IntroStage* intro_stage = NULL;
+PlayStage* play_stage = NULL;
+Stage* current_stage = NULL;
 
 Game::Game(int window_width, int window_height, SDL_Window* window)
 {
@@ -74,11 +340,18 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	font.loadTGA("data/bitmap-font-white.tga"); //load bitmap-font image
 	minifont.loadTGA("data/mini-font-white-4x6.tga"); //load bitmap-font image
 	sprite.loadTGA("data/spritesheet.tga"); //example to load an sprite
-	bgmap.loadTGA("data/house.tga"); 
+	bgmap.loadTGA("data/lvl1.tga");
+    intro.loadTGA("data/introcastle.tga");
+    tiles.loadTGA("data/DungeonTileset.tga");
+    intro.flipY();
 	bgmap.flipY();
-	readCSV();
-
-	//enableAudio(); //enable this line if you plan to add audio to your application
+    std::memcpy(&currentGame.world.mapa, readCSV("data/lvl1.csv", 300), 300 * sizeof(int));
+    
+    Stage::current_stage = new IntroStage();
+    new PlayStage();
+    new MenuStage();
+    
+	enableAudio(); //enable this line if you plan to add audio to your application
 	//synth.playSample("data/coin.wav",1,true);
 	//synth.osc1.amplitude = 0.5;
 }
@@ -88,22 +361,7 @@ void Game::render(void)
 {
 	//Create a new Image (or we could create a global one if we want to keep the previous frame)
 	Image framebuffer(160, 120); //do not change framebuffer size
-
-	//add your code here to fill the framebuffer
-	//...
-
-	//some new useful functions
-		framebuffer.fill( bgcolor );								//fills the image with one color
-		//framebuffer.drawLine( 0, 0, 100,100, Color::RED );		//draws a line
-		//framebuffer.drawImage( sprite, 0, 0 );					//draws full image
-		//framebuffer.drawImage( sprite, 0, 0, framebuffer.width, framebuffer.height );			//draws a scaled image
-		framebuffer.drawImage( bgmap, 0, 0, Area(camerapos.x, camerapos.y, 160, 120));
-        framebuffer.drawImage( sprite, 80, 60, Area((int (time * 6) % 4) * 14*ismoving,facing * 18,14,18) );    //draws only a part of an image
-    
-    //framebuffer.drawImage( sprite, playerpos.x + camerapos.x, playerpos.y + camerapos.y, Area((int (time * 6) % 4) * 14,facing * 18,14,18) );	//draws only a part of an image
-        //framebuffer.drawImage( sprite, playerpos.x + camerapos.x, playerpos.y + camerapos.y, Area( 0,facing * 18,14,18) );    //draws only a part of an image
-		//framebuffer.drawText( "Hello World", 0, 0, font );				//draws some text using a bitmap font in an image (assuming every char is 7x9)
-		//framebuffer.drawText( toString(time), 1, 10, minifont,4,6);	//draws some text using a bitmap font in an image (assuming every char is 4x6)
+    Stage::current_stage->render(framebuffer);
 
 	//send image to screen
 	showFramebuffer(&framebuffer);
@@ -113,42 +371,11 @@ void Game::update(double seconds_elapsed)
 {
 	//Add here your update method
 	//...
-    int speed = 32;
-	//Read the keyboard state, to see all the keycodes: https://wiki.libsdl.org/SDL_Keycode
-	if (Input::isKeyPressed(SDL_SCANCODE_UP)) //if key up
-	{
-        playerfinpos.y -= speed*seconds_elapsed;
-        camerafinpos.y -= speed*seconds_elapsed;
-        ismoving = 1;
-        facing = FACE_UP;
-	}
-	if (Input::isKeyPressed(SDL_SCANCODE_DOWN)) //if key down
-	{
-        playerfinpos.y += speed*seconds_elapsed;
-        camerafinpos.y += speed*seconds_elapsed;
-        ismoving = 1;
-        facing = FACE_DOWN;
-	}
     
-    if (Input::isKeyPressed(SDL_SCANCODE_RIGHT)) //if key up
-    {
-        playerfinpos.x += speed*seconds_elapsed;
-        camerafinpos.x += speed*seconds_elapsed;
-        ismoving = 1;
-        facing = FACE_RIGHT;
-    }
-    if (Input::isKeyPressed(SDL_SCANCODE_LEFT)) //if key down
-    {
-        playerfinpos.x -= speed*seconds_elapsed;
-        camerafinpos.x -= speed*seconds_elapsed;
-        ismoving = 1;
-        facing = FACE_LEFT;
-    }
-    playerpos += ( playerfinpos - playerpos ) * 0.1;
-	camerapos += (camerafinpos - camerapos) * 0.1;
-    if (playerfinpos == playerpos) {
-        ismoving = 0;
-    }
+    Stage::current_stage->update(seconds_elapsed);
+    
+	//camerapos += (camerafinpos - camerapos) * 0.1;
+
     
 	//example of 'was pressed'
 	if (Input::wasKeyPressed(SDL_SCANCODE_A)) //if key A was pressed
@@ -302,3 +529,21 @@ void Game::onAudio(float *buffer, unsigned int len, double time, SDL_AudioSpec& 
 	//fill the audio buffer using our custom retro synth
 	synth.generateAudio(buffer, len, audio_spec);
 }
+
+/* FRAMEBUFER EXAMPLES*/
+
+//add your code here to fill the framebuffer
+//...
+
+//some new useful functions
+//framebuffer.fill( bgcolor );                                //fills the image with one color
+//framebuffer.drawLine( 0, 0, 100,100, Color::RED );        //draws a line
+//framebuffer.drawImage( sprite, 0, 0 );                    //draws full image
+//framebuffer.drawImage( sprite, 0, 0, framebuffer.width, framebuffer.height );            //draws a scaled image
+//intro_stage->render(framebuffer);
+//framebuffer.drawImage( bgmap, 0, 0, Area(camerapos.x, camerapos.y, 160, 120));
+//framebuffer.drawImage( sprite, 80, 60, Area((int (time * 6) % 4) * 14*ismoving,facing * 18,14,18) );    //draws only a part of an image
+//framebuffer.drawImage( sprite, playerpos.x + camerapos.x, playerpos.y + camerapos.y, Area((int (time * 6) % 4) * 14,facing * 18,14,18) );    //draws only a part of an image
+//framebuffer.drawImage( sprite, playerpos.x + camerapos.x, playerpos.y + camerapos.y, Area( 0,facing * 18,14,18) );    //draws only a part of an image
+//framebuffer.drawText( "Hello World", 0, 0, font );                //draws some text using a bitmap font in an image (assuming every char is 7x9)
+//framebuffer.drawText( toString(time), 1, 10, minifont,4,6);    //draws some text using a bitmap font in an image (assuming every char is 4x6)

@@ -97,6 +97,8 @@ public:
 	static Image* Get( std::string name );
 	static std::map<std::string, Image*> s_loaded_images;
 	void registerAs(std::string name);
+    
+    void drawMap(Image tileSet, int mapborders[], int size[2],float time) ;
 };
 
 inline Image operator * (const Image& a, const Image& b) {
