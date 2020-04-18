@@ -22,6 +22,7 @@ Image tiles;
 Color bgcolor(130, 80, 100);
 
 Vector2 camerapos(130,0);
+Vector2 camfinpos(130,0);
 
 enum eCellType : uint8 { EMPTY, WALL, DOOR, OBJECT, PJ};
 enum eItemType : uint8 { NOTHING, KEY1, KEY2};
@@ -60,7 +61,7 @@ myGameData currentGame;
 
 int canMove(Vector2 position) {
     for (int z = 0; z<8; z++) {
-        if (currentGame.world.mapa[ ((int(currentGame.player.finpos.x + 8)*20/960) ) + (20 * (int(currentGame.player.finpos.y + 16)*15/960)) ] == currentGame.world.isFloor[z]) {
+        if (currentGame.world.mapa[ (((int(currentGame.player.actualpos.x + 8 + camfinpos.x)*120/960) ) + 120 *((int(currentGame.player.actualpos.y + 16 + camfinpos.y)*120/960)) ) ] == currentGame.world.isFloor[z]) {
             //if (debugon) {
                 std::cout << (int(position.x)*20/160) << ',' << (int(position.y)*15/120)+1;
                 std::cout << currentGame.world.mapa[ ((int(currentGame.player.finpos.x)*20/160) + 1) + (20 * (int(currentGame.player.finpos.y)*15/120) + 2) ] ;
@@ -70,6 +71,7 @@ int canMove(Vector2 position) {
             return 1;
         }
     }
+    std::cout << ((int(currentGame.player.finpos.x + 8)*120/960) ) << ", " <<(120 * (int(currentGame.player.finpos.y + 16)*120/960)) << endl;
     std::cout << currentGame.world.mapa[ ((int(currentGame.player.finpos.x)*20/160) + 1) + (20 * (int(currentGame.player.finpos.y)*15/120) + 2) ] ;
     return 0;
 }
@@ -145,14 +147,14 @@ public:
         if (Input::isKeyPressed(SDL_SCANCODE_UP)) //if key up
         {
             //currentGame.player.finpos.y -= speed*seconds_elapsed;
-            camerapos.y -= speed*seconds_elapsed;
+            camfinpos.y -= speed*seconds_elapsed;
             currentGame.player.ismoving = 1;
             currentGame.player.facing = currentGame.player.FACE_UP;
         }
         if (Input::isKeyPressed(SDL_SCANCODE_DOWN)) //if key down
         {
             //currentGame.player.finpos.y += speed*seconds_elapsed;
-            camerapos.y += speed*seconds_elapsed;
+            camfinpos.y += speed*seconds_elapsed;
             currentGame.player.ismoving = 1;
             currentGame.player.facing = currentGame.player.FACE_DOWN;
         }
@@ -160,33 +162,37 @@ public:
         if (Input::isKeyPressed(SDL_SCANCODE_RIGHT)) //if key up
         {
             //currentGame.player.finpos.x += speed*seconds_elapsed;
-            camerapos.x += speed*seconds_elapsed;
+            camfinpos.x += speed*seconds_elapsed;
             currentGame.player.ismoving = 1;
             currentGame.player.facing = currentGame.player.FACE_RIGHT;
         }
         if (Input::isKeyPressed(SDL_SCANCODE_LEFT)) //if key down
         {
             //currentGame.player.finpos.x -= speed*seconds_elapsed;
-            camerapos.x -= speed*seconds_elapsed;
+            camfinpos.x -= speed*seconds_elapsed;
             currentGame.player.ismoving = 1;
             currentGame.player.facing = currentGame.player.FACE_LEFT;
         }
-        currentGame.player.actualpos += ( currentGame.player.finpos - currentGame.player.actualpos ) * 0.1;
-    
-        /*if (canMove(currentGame.player.finpos)) {
-            currentGame.player.actualpos += ( currentGame.player.finpos - currentGame.player.actualpos ) * 0.1;
+        //camerapos += ( camfinpos - camerapos ) * 0.1;
+        //std::cout << bgmap.height << ", " << bgmap.width << std::endl;
+        
+        std::cout << ((int(currentGame.player.actualpos.x + 8 + camfinpos.x)*120/960) ) << ", " <<((int(currentGame.player.actualpos.y + 16 + camfinpos.y)*120/960)) << endl;
+        std::cout << currentGame.world.mapa[ (((int(currentGame.player.actualpos.x + 8 + camfinpos.x)*120/960) ) + 120 *((int(currentGame.player.actualpos.y + 16 + camfinpos.y)*120/960)) ) ] ;
+        
+        if (canMove(camfinpos + currentGame.player.actualpos)) {
+            camerapos += ( camfinpos - camerapos ) * 0.1;
         }
         else {
-            currentGame.player.finpos = currentGame.player.actualpos;
+            camfinpos = camerapos;
         }
-         */
+        
         if (debugon) {
             std::cout << (int(currentGame.player.finpos.x)*20/160) + 1 << ',' << (int(currentGame.player.finpos.y)*15/120) + 2;
             std::cout << currentGame.world.mapa[ ((int(currentGame.player.finpos.x)*20/160) + 1) + (20 * (int(currentGame.player.finpos.y)*15/120) + 2) ] ;
             std::cout << currentGame.world.mapa[ (11 + 20*11) ] ;
         }
     
-        Vector2 difpos = currentGame.player.finpos - currentGame.player.actualpos;
+        Vector2 difpos = camfinpos - camerapos ;
         if (fabs(difpos.y) < 2 && fabs((difpos).x) < 2) {
             currentGame.player.ismoving = 0;
         }
