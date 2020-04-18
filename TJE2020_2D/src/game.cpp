@@ -15,13 +15,13 @@ Game* Game::instance = NULL;
 Image font;
 Image minifont;
 Image sprite;
-Image bgmap;
+unsigned int w = 960;
+Image bgmap(w,w);
 Image intro;
 Image tiles;
 Color bgcolor(130, 80, 100);
 
-Vector2 camerapos;
-Vector2 camerafinpos;
+Vector2 camerapos(130,0);
 
 enum eCellType : uint8 { EMPTY, WALL, DOOR, OBJECT, PJ};
 enum eItemType : uint8 { NOTHING, KEY1, KEY2};
@@ -33,17 +33,17 @@ struct sCell { // no se usa aun
 
 struct myMap {
     int isFloor[8] = {116, 117, 118, 119, 102, 103, 104, 105};
-    int size_components[2] = { 20, 15 };
-    int size = 300;
-    sCell celdas[300];
-    int mapa[300];
+    int size_components[2] = { 120, 120 };
+    int size = 14400;
+    sCell celdas[14400];
+    int mapa[14400];
     int npcs[300];
 };
 
 struct myPlayer {//no se usa aun
     enum {FACE_DOWN, FACE_RIGHT, FACE_LEFT, FACE_UP};
     Vector2 actualpos = Vector2(80,60);
-    Vector2 finpos = Vector2(90,85);
+    Vector2 finpos = Vector2(80,60);
     int ismoving = 0;
     int facing = FACE_DOWN;
     int life;
@@ -60,13 +60,13 @@ myGameData currentGame;
 
 int canMove(Vector2 position) {
     for (int z = 0; z<8; z++) {
-        if (currentGame.world.mapa[ ((int(currentGame.player.finpos.x + 8)*20/160) ) + (20 * (int(currentGame.player.finpos.y + 16)*15/120)) ] == currentGame.world.isFloor[z]) {
-            if (debugon) {
+        if (currentGame.world.mapa[ ((int(currentGame.player.finpos.x + 8)*20/960) ) + (20 * (int(currentGame.player.finpos.y + 16)*15/960)) ] == currentGame.world.isFloor[z]) {
+            //if (debugon) {
                 std::cout << (int(position.x)*20/160) << ',' << (int(position.y)*15/120)+1;
                 std::cout << currentGame.world.mapa[ ((int(currentGame.player.finpos.x)*20/160) + 1) + (20 * (int(currentGame.player.finpos.y)*15/120) + 2) ] ;
                 std::cout << currentGame.world.isFloor[z];
                 
-            }
+            //}
             return 1;
         }
     }
@@ -109,7 +109,7 @@ public:
             changeStage("play");
         }
         if (Stage::current_stage == Stage::s_stages["intro"] && currentGame.isplaying == 0) {
-            Game::instance->synth.playSample("data/music.wav", 0.8, false);
+            Game::instance->synth.playSample("data/music.wav", 0.2, true);
             currentGame.isplaying = 1;
         }
     }
@@ -121,7 +121,10 @@ public:
     PlayStage() : Stage("play") {}
     void render(Image& fb) {
         fb.fill(Color::GREEN);
-        fb.drawMap(tiles, currentGame.world.mapa, currentGame.world.size_components, 1);
+        //fb.drawMap(tiles, currentGame.world.mapa, currentGame.world.size_components, 1, currentGame.player.actualpos);
+        bgmap.drawMap(tiles, currentGame.world.mapa, currentGame.world.size_components, 1, currentGame.player.actualpos);
+        //fb.drawImage(bgmap, 0, 0, 160, 120);
+        fb.drawImage(bgmap, 0, 0, Area(camerapos.x,camerapos.y,160,120));
         fb.drawImage( sprite, currentGame.player.actualpos.x, currentGame.player.actualpos.y, Area((int (Game::instance->time * 6) % 4) * 14*currentGame.player.ismoving,currentGame.player.facing * 18,14,18) );
         if (debugon) {
             fb.drawImage( bgmap, 0, 0, Area(0, 0, 160, 120));
@@ -141,41 +144,42 @@ public:
         //Read the keyboard state, to see all the keycodes: https://wiki.libsdl.org/SDL_Keycode
         if (Input::isKeyPressed(SDL_SCANCODE_UP)) //if key up
         {
-            currentGame.player.finpos.y -= speed*seconds_elapsed;
-            //camerafinpos.y -= speed*seconds_elapsed;
+            //currentGame.player.finpos.y -= speed*seconds_elapsed;
+            camerapos.y -= speed*seconds_elapsed;
             currentGame.player.ismoving = 1;
             currentGame.player.facing = currentGame.player.FACE_UP;
         }
         if (Input::isKeyPressed(SDL_SCANCODE_DOWN)) //if key down
         {
-            currentGame.player.finpos.y += speed*seconds_elapsed;
-            //camerafinpos.y += speed*seconds_elapsed;
+            //currentGame.player.finpos.y += speed*seconds_elapsed;
+            camerapos.y += speed*seconds_elapsed;
             currentGame.player.ismoving = 1;
             currentGame.player.facing = currentGame.player.FACE_DOWN;
         }
         
         if (Input::isKeyPressed(SDL_SCANCODE_RIGHT)) //if key up
         {
-            currentGame.player.finpos.x += speed*seconds_elapsed;
-            //camerafinpos.x += speed*seconds_elapsed;
+            //currentGame.player.finpos.x += speed*seconds_elapsed;
+            camerapos.x += speed*seconds_elapsed;
             currentGame.player.ismoving = 1;
             currentGame.player.facing = currentGame.player.FACE_RIGHT;
         }
         if (Input::isKeyPressed(SDL_SCANCODE_LEFT)) //if key down
         {
-            currentGame.player.finpos.x -= speed*seconds_elapsed;
-            //camerafinpos.x -= speed*seconds_elapsed;
+            //currentGame.player.finpos.x -= speed*seconds_elapsed;
+            camerapos.x -= speed*seconds_elapsed;
             currentGame.player.ismoving = 1;
             currentGame.player.facing = currentGame.player.FACE_LEFT;
         }
-        //currentGame.player.actualpos += ( playerfinpos - currentGame.player.actualpos ) * 0.1;
+        currentGame.player.actualpos += ( currentGame.player.finpos - currentGame.player.actualpos ) * 0.1;
     
-        if (canMove(currentGame.player.finpos)) {
+        /*if (canMove(currentGame.player.finpos)) {
             currentGame.player.actualpos += ( currentGame.player.finpos - currentGame.player.actualpos ) * 0.1;
         }
         else {
             currentGame.player.finpos = currentGame.player.actualpos;
         }
+         */
         if (debugon) {
             std::cout << (int(currentGame.player.finpos.x)*20/160) + 1 << ',' << (int(currentGame.player.finpos.y)*15/120) + 2;
             std::cout << currentGame.world.mapa[ ((int(currentGame.player.finpos.x)*20/160) + 1) + (20 * (int(currentGame.player.finpos.y)*15/120) + 2) ] ;
@@ -307,7 +311,7 @@ int * readCSV(string filesrc, int size) { //archivo y tamaño de area
         }
     }
     int actualpos = 0;
-    while (10 * 7 > actualpos){
+    while (120*120 > actualpos){
         fprintf(stderr, "%d,", mapborder[actualpos]);
         if (actualpos == 0) {
         }
@@ -340,12 +344,15 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	font.loadTGA("data/bitmap-font-white.tga"); //load bitmap-font image
 	minifont.loadTGA("data/mini-font-white-4x6.tga"); //load bitmap-font image
 	sprite.loadTGA("data/spritesheet.tga"); //example to load an sprite
-	bgmap.loadTGA("data/lvl1.tga");
+	//bgmap.loadTGA("data/lvl1.tga");
     intro.loadTGA("data/introcastle.tga");
     tiles.loadTGA("data/DungeonTileset.tga");
     intro.flipY();
-	bgmap.flipY();
-    std::memcpy(&currentGame.world.mapa, readCSV("data/lvl1.csv", 300), 300 * sizeof(int));
+	//bgmap.flipY();
+    
+    //std::memcpy(&currentGame.world.mapa, readCSV("data/lvl1.csv", 300), 300 * sizeof(int));
+    
+    std::memmove(&currentGame.world.mapa, readCSV("data/house.csv", 14400), 14400 * sizeof(int));
     
     Stage::current_stage = new IntroStage();
     new PlayStage();

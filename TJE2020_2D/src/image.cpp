@@ -480,12 +480,13 @@ Image* Image::Get(std::string name)
 	return img;
 }
 
-void Image::drawMap(Image tileSet, int mapborders[], int size[2],float time) {
+void Image::drawMap(Image tileSet, int mapborders[], int size[2],float time, Vector2 actualpos) {
+    //Vector2 cellActual(((int(actualpos.x + 8)*20/160) ) , (20 * (int(actualpos.y + 16)*15/120)) );
     for (int n = 0; n < size[0]; n++){
         for (int m = 0; m < size[1]; m++){
-            int aux = mapborders[m * size[0] + n];
-            int x = aux % 14;
-            int y = aux / 14;
+            int pos = mapborders[m * size[0] + n];
+            int x = pos % 14;
+            int y = pos / 14;
             /*if (aux == 376  aux == 400  aux == 424  aux == 448  aux == 472  aux == 496) {
                 this->drawImage(tileSet, n * 16, m * 16, Area(1 + 1 * (x + (int(time * 2) % 4)) + 16 * (x + (int(time * 2) % 4)), 1 + 1 * y + 16 * y, 16, 16));
             }
