@@ -25,9 +25,9 @@ Stage* Stage::current_stage = NULL;
 std::map<std::string, Stage*> Stage::s_stages;
 
 
-IntroStage* intro_stage = NULL;
-PlayStage* play_stage = NULL;
+
 Stage* current_stage = NULL;
+
 
 Game::Game(int window_width, int window_height, SDL_Window* window)
 {
@@ -53,9 +53,42 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
     Vector2 pos(80,60);
     currentGame.player.actualpos = pos;
     currentGame.player.finpos = pos;
-    Vector2 campos(130, 0);
+    Vector2 campos(440, 420);
     currentGame.player.camerapos = campos;
     currentGame.player.camfinpos = campos;
+    currentGame.world.celdas[1].xpos = Vector2(17,98);
+    currentGame.world.celdas[1].ypos = Vector2(18,99);
+    currentGame.world.celdas[1].item = KEY1;
+    currentGame.world.celdas[1].cellType = CHEST;
+    currentGame.world.celdas[2].xpos = Vector2(69,74);
+    currentGame.world.celdas[2].ypos = Vector2(70,75);
+    currentGame.world.celdas[2].item = KEY2;
+    currentGame.world.celdas[1].cellType = CHEST;
+    currentGame.world.celdas[3].xpos = Vector2(95,77);
+    currentGame.world.celdas[3].ypos = Vector2(96,78);
+    currentGame.world.celdas[3].item = KEY3;
+    currentGame.world.celdas[1].cellType = CHEST;
+    currentGame.world.celdas[4].xpos = Vector2(16,64);
+    currentGame.world.celdas[4].ypos = Vector2(17,65);
+    currentGame.world.celdas[4].item = KEY4;
+    currentGame.world.celdas[1].cellType = CHEST;
+    currentGame.world.celdas[5].xpos = Vector2(57,59);
+    currentGame.world.celdas[5].ypos = Vector2(58,60);
+    currentGame.world.celdas[5].item = KEY5;
+    currentGame.world.celdas[1].cellType = CHEST;
+    currentGame.world.celdas[6].xpos = Vector2(104,42);
+    currentGame.world.celdas[6].ypos = Vector2(105,43);
+    currentGame.world.celdas[6].item = KEY6;
+    currentGame.world.celdas[1].cellType = CHEST;
+    currentGame.world.celdas[7].xpos = Vector2(64,27);
+    currentGame.world.celdas[7].ypos = Vector2(65,28);
+    currentGame.world.celdas[7].item = KEY7;
+    currentGame.world.celdas[1].cellType = CHEST;
+    currentGame.world.celdas[8].xpos = Vector2(72,9);
+    currentGame.world.celdas[8].ypos = Vector2(73,10);
+    currentGame.world.celdas[8].item = KEY8;
+    currentGame.world.celdas[1].cellType = CHEST;
+    
     
     //std::memcpy(&currentGame.world.mapa, readCSV("data/lvl1.csv", 300), 300 * sizeof(int));
     
@@ -65,7 +98,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
     Stage::current_stage = new IntroStage();
     new PlayStage();
     new MenuStage();
-    
+    new Dialog();
 	enableAudio(); //enable this line if you plan to add audio to your application
 	//synth.playSample("data/coin.wav",1,true);
 	//synth.osc1.amplitude = 0.5;

@@ -56,6 +56,7 @@ int * SaveLoad::readCSV(string filesrc, int size) { //archivo y tamaño de area
             }
         }
     }
+    /*
     int actualpos = 0;
     while (120*120 > actualpos){
         fprintf(stderr, "%d,", mapborder[actualpos]);
@@ -66,7 +67,7 @@ int * SaveLoad::readCSV(string filesrc, int size) { //archivo y tamaño de area
             cout << '\n';
         }
         actualpos += 1;
-    }
+    }*/
     return mapborder;
 }
 
