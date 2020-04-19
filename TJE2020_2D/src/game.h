@@ -9,6 +9,8 @@
 #include "image.h"
 #include "utils.h"
 #include "synth.h"
+#include "saveload.h"
+#include "stage.h"
 
 class Game
 {
@@ -27,6 +29,16 @@ public:
 	int fps;
 	bool must_exit;
 
+    
+    //images
+    Image intro;
+    Image font;
+    Image minifont;
+    Image sprite;
+    unsigned int w = 960;
+    Image bgmap;
+    Image tiles;
+    
 	//audio
 	Synth synth;
 
