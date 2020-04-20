@@ -9,8 +9,11 @@
 #include "image.h"
 #include "utils.h"
 #include "synth.h"
-#include "saveload.h"
 #include "stage.h"
+#include "saveload.h"
+
+
+#include "input.h"
 
 class Game
 {

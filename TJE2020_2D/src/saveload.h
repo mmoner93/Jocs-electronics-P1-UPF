@@ -5,18 +5,18 @@
 #ifndef SAVELOAD_H
 #define SAVELOAD_H
 
-#include "includes.h"
-#include "utils.h"
-#include <fstream>
+#include "stage.h"
 
 using namespace std;
 
 class SaveLoad {
 public:
+    //myGameData saveloadGame;
     SaveLoad(Vector2 pos, int lvl);
     static void saveGameInfo();
     static bool loadGameInfo();
     static int * readCSV(string filesrc, int size);
+    
 };
 
 

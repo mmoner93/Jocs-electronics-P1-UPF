@@ -1,8 +1,5 @@
-#include "game.h"
-#include "utils.h"
-#include "input.h"
-#include "image.h"
 
+#include "game.h"
 #include <fstream>
 #include <iostream>
 #include <cmath>
@@ -53,52 +50,127 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
     Vector2 pos(80,60);
     currentGame.player.actualpos = pos;
     currentGame.player.finpos = pos;
-    Vector2 campos(440, 420);
+    //Vector2 campos(505, 720);
+    Vector2 campos(20, 140);
     currentGame.player.camerapos = campos;
     currentGame.player.camfinpos = campos;
-    currentGame.world.celdas[1].xpos = Vector2(17,98);
-    currentGame.world.celdas[1].ypos = Vector2(18,99);
-    currentGame.world.celdas[1].item = KEY1;
-    currentGame.world.celdas[1].cellType = CHEST;
-    currentGame.world.celdas[2].xpos = Vector2(69,74);
-    currentGame.world.celdas[2].ypos = Vector2(70,75);
-    currentGame.world.celdas[2].item = KEY2;
-    currentGame.world.celdas[1].cellType = CHEST;
-    currentGame.world.celdas[3].xpos = Vector2(95,77);
-    currentGame.world.celdas[3].ypos = Vector2(96,78);
-    currentGame.world.celdas[3].item = KEY3;
-    currentGame.world.celdas[1].cellType = CHEST;
-    currentGame.world.celdas[4].xpos = Vector2(16,64);
-    currentGame.world.celdas[4].ypos = Vector2(17,65);
-    currentGame.world.celdas[4].item = KEY4;
-    currentGame.world.celdas[1].cellType = CHEST;
-    currentGame.world.celdas[5].xpos = Vector2(57,59);
-    currentGame.world.celdas[5].ypos = Vector2(58,60);
-    currentGame.world.celdas[5].item = KEY5;
-    currentGame.world.celdas[1].cellType = CHEST;
-    currentGame.world.celdas[6].xpos = Vector2(104,42);
-    currentGame.world.celdas[6].ypos = Vector2(105,43);
-    currentGame.world.celdas[6].item = KEY6;
-    currentGame.world.celdas[1].cellType = CHEST;
-    currentGame.world.celdas[7].xpos = Vector2(64,27);
-    currentGame.world.celdas[7].ypos = Vector2(65,28);
-    currentGame.world.celdas[7].item = KEY7;
-    currentGame.world.celdas[1].cellType = CHEST;
-    currentGame.world.celdas[8].xpos = Vector2(72,9);
-    currentGame.world.celdas[8].ypos = Vector2(73,10);
-    currentGame.world.celdas[8].item = KEY8;
-    currentGame.world.celdas[1].cellType = CHEST;
-    
     
     //std::memcpy(&currentGame.world.mapa, readCSV("data/lvl1.csv", 300), 300 * sizeof(int));
     
     std::memmove(&currentGame.world.mapa, SaveLoad::readCSV("data/house.csv", 14400), 14400 * sizeof(int));
+    std::memmove(&currentGame.world.obj, SaveLoad::readCSV("data/obj.csv", 14400), 14400 * sizeof(int));
+    
+    for (int n = 0; n < 120; n++) {
+        for (int m = 0; m < 120; m++) {
+            if (currentGame.world.obj[m * 120 + n] == TELEPORT) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(465, 760);
+            }
+            else if (currentGame.world.obj[m * 120 + n] == TELEPORT1) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(690, 320);
+            }
+            else if (currentGame.world.obj[m * 120 + n] == TELEPORT2) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(320, 370);
+            }
+            else if (currentGame.world.obj[m * 120 + n] == TELEPORT3) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(320, 370);
+            }
+            /*else if (currentGame.world.obj[m * 120 + n] == TELEPORT3) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(320, 370);
+            }*/
+            
+            else if (currentGame.world.obj[m * 120 + n] == STAIRS0) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(710, 45);
+                currentGame.world.celdas[m * 120 + n].item = OPEN;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == STAIRS1) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(120, 140);
+                currentGame.world.celdas[m * 120 + n].item = OPEN;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == STAIRS2) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(520, 280);
+                currentGame.world.celdas[m * 120 + n].item = OPEN;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == STAIRS3) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(120, 140);
+                currentGame.world.celdas[m * 120 + n].item = OPEN;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == STAIRS4) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(370, 340);
+                currentGame.world.celdas[m * 120 + n].item = OPEN;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == STAIRS5) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(120, 20);
+                currentGame.world.celdas[m * 120 + n].item = OPEN;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == STAIRS6) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(290, 320);
+                currentGame.world.celdas[m * 120 + n].item = KEY1;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == STAIRS7) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(715, 110);
+                currentGame.world.celdas[m * 120 + n].item = OPEN;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == STAIRS8) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(65, 425);
+                currentGame.world.celdas[m * 120 + n].item = OPEN;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == STAIRS9) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(257, 15);
+                currentGame.world.celdas[m * 120 + n].item = OPEN;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == STAIRS10) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(505, 720);
+                currentGame.world.celdas[m * 120 + n].item = OPEN;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == HOLE) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(220, 270);
+                currentGame.world.celdas[m * 120 + n].item = OPEN;
+            }
+            
+            else if (currentGame.world.obj[m * 120 + n] == CHEST0) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].item = KEY1;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == CHEST1) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].item = KEY2;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == CHEST2) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].item = KEY3;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == CHEST3) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].item = KEY4;
+            }
+            
+        }
+    }
+
+    
     auxbg.drawMap(Game::instance->tiles, currentGame.world.mapa, currentGame.world.size_components, 1, currentGame.player.actualpos);
     bgmap = auxbg;
     Stage::current_stage = new IntroStage();
     new PlayStage();
     new MenuStage();
-    new Dialog();
+    
 	enableAudio(); //enable this line if you plan to add audio to your application
 	//synth.playSample("data/coin.wav",1,true);
 	//synth.osc1.amplitude = 0.5;

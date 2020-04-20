@@ -56,18 +56,77 @@ int * SaveLoad::readCSV(string filesrc, int size) { //archivo y tamaño de area
             }
         }
     }
-    /*
-    int actualpos = 0;
-    while (120*120 > actualpos){
-        fprintf(stderr, "%d,", mapborder[actualpos]);
-        if (actualpos == 0) {
-        }
-        else if ((actualpos+1) % 10 == 0)
-        {
-            cout << '\n';
-        }
-        actualpos += 1;
-    }*/
     return mapborder;
 }
 
+
+
+
+/*
+ for (int j = 0; j < numobjects; j++) {
+ if (aux == 117) {
+     mapobj[pos].cellType = TELEPORT;
+     mapobj[pos].item = NOTHING;
+     mapobj[pos].transport = Vector2(73*8,102*8);
+ }
+ else if (aux == 1) {
+     mapobj[pos].cellType = TELEPORT;
+     mapobj[pos].item = NOTHING;
+     mapobj[pos].transport = Vector2(50,50);
+ }
+ else if (aux == 2) {
+     mapobj[pos].cellType = TELEPORT;
+     mapobj[pos].item = NOTHING;
+     mapobj[pos].transport = Vector2(50,50);
+ }
+ else if (aux == 3) {
+     mapobj[pos].cellType = TELEPORT;
+     mapobj[pos].item = NOTHING;
+     mapobj[pos].transport = Vector2(50,50);
+ }
+ else if (aux == 4) {
+     mapobj[pos].cellType = TELEPORT;
+     mapobj[pos].item = NOTHING;
+     mapobj[pos].transport = Vector2(50,50);
+ }
+ else if (aux == 5) {
+     mapobj[pos].cellType = TELEPORT;
+     mapobj[pos].item = NOTHING;
+     mapobj[pos].transport = Vector2(50,50);
+ }
+ else if (aux == 6) {
+     mapobj[pos].cellType = TELEPORT;
+     mapobj[pos].item = NOTHING;
+     mapobj[pos].transport = Vector2(50,50);
+ }
+ else if (aux == 7) {
+     mapobj[pos].cellType = TELEPORT;
+     mapobj[pos].item = NOTHING;
+     mapobj[pos].transport = Vector2(50,50);
+ }
+ else if (aux == 8) {
+     mapobj[pos].cellType = TELEPORT;
+     mapobj[pos].item = NOTHING;
+     mapobj[pos].transport = Vector2(50,50);
+ }
+ else if (aux == 9) {
+     mapobj[pos].cellType = TELEPORT;
+     mapobj[pos].item = NOTHING;
+     mapobj[pos].transport = Vector2(50,50);
+ }
+ else if (aux == 10) {
+     mapobj[pos].cellType = TELEPORT;
+     mapobj[pos].item = NOTHING;
+     mapobj[pos].transport = Vector2(50,50);
+ }
+ else if (aux == 11) {
+     mapobj[pos].cellType = TELEPORT;
+     mapobj[pos].item = NOTHING;
+     mapobj[pos].transport = Vector2(50,50);
+ }
+ 
+ else if (aux == 17) {
+     mapobj[pos].cellType = CHEST;
+     mapobj[pos].item = KEY1;
+ }
+ */
