@@ -14,7 +14,7 @@
 #include <cmath>
 
 using namespace std;
-
+/*
 enum eCellType  { EMPTY = 255, STAIRS0 = 0, STAIRS1 = 1, HOLE = 2, STAIRS2 = 3, STAIRS3 = 4 ,STAIRS4 = 5,STAIRS5 = 6,STAIRS6 = 7, STAIRS7 = 8, STAIRS8 = 9, STAIRS9 = 10, TELEPORT = 11, TELEPORT1 = 12, TELEPORT2 = 13, TELEPORT3 = 14, STAIRS10 = 15, CHEST0 = 16, CHEST1 = 17, CHEST2 = 18,  CHEST3 = 19, CHEST4 = 20};
 enum eItemType  { NOTHING = 0, KEY1, KEY2, KEY3, KEY4, KEY5, KEY6, KEY7, KEY8, OPEN, CLOSED};
 
@@ -60,7 +60,7 @@ public:
     int actualArea;
     int isplaying = 0;
 };
-
+*/
 
 
 class Stage

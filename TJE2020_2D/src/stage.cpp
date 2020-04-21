@@ -215,7 +215,6 @@ int Stage::stairs(myGameData& currentGame) {
         if (isopen(currentGame)) {
             move = true;
         }
-        else {/*misatge esta tancat*/}
     }
     else if (currentGame.world.obj[ int(aux.x) + 120 *int(aux.y) ] == STAIRS7) {
         move = true;
@@ -366,21 +365,21 @@ void MenuStage::render(Image& fb,  myGameData& currentGame) {
 
 }
 
-void MenuStage::update(double seconds_elapsed, myGameData& currentGamep) {
+void MenuStage::update(double seconds_elapsed, myGameData& currentGame) {
 
     if (Input::wasKeyPressed(SDL_SCANCODE_UP)) {
         menupos -= 1;
     }
     if (Input::wasKeyPressed(SDL_SCANCODE_DOWN)) {
-        SaveLoad::saveGameInfo();
+        SaveLoad::saveGameInfo(currentGame);
         menupos += 1;
     }
     if (Input::wasKeyPressed(SDL_SCANCODE_A)) {
         if (menupos == 0) {
-            SaveLoad::saveGameInfo();
+            SaveLoad::saveGameInfo(currentGame);
         }
         else if (menupos == 1) {
-            SaveLoad::loadGameInfo();
+            SaveLoad::loadGameInfo(currentGame);
         }
         else {
             changeStage("play");

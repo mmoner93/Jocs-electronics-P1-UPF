@@ -3,36 +3,29 @@
 
 
 
-SaveLoad::SaveLoad(Vector2 pos, int lvl){
-    Vector2 position = pos;
-    int level = lvl;
-}
 
-void SaveLoad::saveGameInfo()
+void SaveLoad::saveGameInfo(myGameData& currentGame)
 {
-    //sGameInfo game_info(currentGame.player.actualpos, 1);
-    SaveLoad game_info(Vector2(0,0),1);
+    myGameData save = currentGame;
     //fill here game_info with all game data
     //...
     //save to file
     FILE* fp = fopen("savegame.bin","wb");
-    fwrite(&game_info, sizeof(SaveLoad),1,fp);
+    fwrite(&save, sizeof(myGameData),1,fp);
     fclose(fp);
 }
 
-bool SaveLoad::loadGameInfo()
+bool SaveLoad::loadGameInfo(myGameData& currentGame)
 {
-    //sGameInfo game_info(Vector2(0,0),1);
-    SaveLoad game_info(Vector2(0,0),1);
+    myGameData load;
     //load file
     FILE* fp = fopen("savegame.bin","rb");
     if(fp == NULL) //no savegame found
        return false;
 
-    fread(&game_info, sizeof(SaveLoad),1,fp);
+    fread(&load, sizeof(myGameData),1,fp);
     fclose(fp);
-
-    //currentGame.player.actualpos = game_info.position;
+    currentGame = load;
 
     return true;
 }
