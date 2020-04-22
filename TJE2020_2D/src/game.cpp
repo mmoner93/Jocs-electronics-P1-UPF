@@ -50,16 +50,19 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
     Vector2 pos(80,60);
     currentGame.player.actualpos = pos;
     currentGame.player.finpos = pos;
-    //Vector2 campos(505, 720);
-    Vector2 campos(20, 140);
+    //Vector2 campos(640, 670);
+    Vector2 campos(40, 140);    // init game
     currentGame.player.camerapos = campos;
     currentGame.player.camfinpos = campos;
     
     //std::memcpy(&currentGame.world.mapa, readCSV("data/lvl1.csv", 300), 300 * sizeof(int));
-    
+    /*
     std::memmove(&currentGame.world.mapa, SaveLoad::readCSV("data/house.csv", 14400), 14400 * sizeof(int));
     std::memmove(&currentGame.world.obj, SaveLoad::readCSV("data/obj.csv", 14400), 14400 * sizeof(int));
+    std::memmove(&currentGame.world.demo, SaveLoad::readCSV("data/demo.csv", 14400), 14400 * sizeof(int));
+    std::memmove(&currentGame.world.objdemo, SaveLoad::readCSV("data/demo_obj.csv", 14400), 14400 * sizeof(int));*/
     
+    /*
     for (int n = 0; n < 120; n++) {
         for (int m = 0; m < 120; m++) {
             if (currentGame.world.obj[m * 120 + n] == TELEPORT) {
@@ -78,10 +81,6 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
                 currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
                 currentGame.world.celdas[m * 120 + n].transport = Vector2(320, 370);
             }
-            /*else if (currentGame.world.obj[m * 120 + n] == TELEPORT3) {
-                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
-                currentGame.world.celdas[m * 120 + n].transport = Vector2(320, 370);
-            }*/
             
             else if (currentGame.world.obj[m * 120 + n] == STAIRS0) {
                 currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
@@ -131,11 +130,26 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
             else if (currentGame.world.obj[m * 120 + n] == STAIRS9) {
                 currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
                 currentGame.world.celdas[m * 120 + n].transport = Vector2(257, 15);
-                currentGame.world.celdas[m * 120 + n].item = OPEN;
+                currentGame.world.celdas[m * 120 + n].item = KEY2;
             }
             else if (currentGame.world.obj[m * 120 + n] == STAIRS10) {
                 currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
                 currentGame.world.celdas[m * 120 + n].transport = Vector2(505, 720);
+                currentGame.world.celdas[m * 120 + n].item = OPEN;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == STAIRS11) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(640, 670);
+                currentGame.world.celdas[m * 120 + n].item = KEY3;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == STAIRS12) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(290, 550);
+                currentGame.world.celdas[m * 120 + n].item = OPEN;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == STAIRS13) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].transport = Vector2(640, 670);
                 currentGame.world.celdas[m * 120 + n].item = OPEN;
             }
             else if (currentGame.world.obj[m * 120 + n] == HOLE) {
@@ -152,24 +166,37 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
                 currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
                 currentGame.world.celdas[m * 120 + n].item = KEY2;
             }
-            else if (currentGame.world.obj[m * 120 + n] == CHEST2) {
+            else if (currentGame.world.obj[m * 120 + n] == CHEST2) { /// espada para romper piedras
                 currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
-                currentGame.world.celdas[m * 120 + n].item = KEY3;
+                currentGame.world.celdas[m * 120 + n].item = SWORD;
             }
             else if (currentGame.world.obj[m * 120 + n] == CHEST3) {
                 currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].item = KEY3;
+            }
+            else if (currentGame.world.obj[m * 120 + n] == CHEST4) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
                 currentGame.world.celdas[m * 120 + n].item = KEY4;
             }
-            
+            else if (currentGame.world.obj[m * 120 + n] == CHESTWIN) {
+                currentGame.world.celdas[m * 120 + n].pos = Vector2(m,n);
+                currentGame.world.celdas[m * 120 + n].item = KEYWIN;
+            }
         }
     }
-
-    
+*/
+    SaveLoad::init(currentGame, 2);
     auxbg.drawMap(Game::instance->tiles, currentGame.world.mapa, currentGame.world.size_components, 1, currentGame.player.actualpos);
-    bgmap = auxbg;
+    bghouse = auxbg;
+    auxbg.drawMap(Game::instance->tiles, currentGame.world.demo, currentGame.world.size_components, 1, currentGame.player.actualpos);
+    bgdemo = auxbg;
     Stage::current_stage = new IntroStage();
     new PlayStage();
+    new IntroMenuStage();
     new MenuStage();
+    new Dialog();
+    new Move();
+    new Win();
     
 	enableAudio(); //enable this line if you plan to add audio to your application
 	//synth.playSample("data/coin.wav",1,true);

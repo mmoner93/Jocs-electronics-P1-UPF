@@ -5,6 +5,7 @@
 #ifndef SAVELOAD_H
 #define SAVELOAD_H
 
+
 #include "struct.h"
 #include <fstream>
 
@@ -15,7 +16,7 @@ public:
     static void saveGameInfo(myGameData& currentGame);
     static bool loadGameInfo(myGameData& currentGame);
     static int * readCSV(string filesrc, int size);
-    
+    static void init(myGameData& currentGame, int u);
 };
 
 

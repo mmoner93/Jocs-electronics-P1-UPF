@@ -39,6 +39,8 @@ public:
     Image sprite;
     unsigned int w = 960;
     Image bgmap;
+    Image bgdemo;
+    Image bghouse;
     Image tiles;
     
 	//audio
