@@ -487,15 +487,7 @@ void Image::drawMap(Image tileSet, int mapborders[], int size[2],float time, Vec
             int pos = mapborders[m * size[0] + n];
             int x = pos % 14;
             int y = pos / 14;
-            /*if (aux == 376  aux == 400  aux == 424  aux == 448  aux == 472  aux == 496) {
-                this->drawImage(tileSet, n * 16, m * 16, Area(1 + 1 * (x + (int(time * 2) % 4)) + 16 * (x + (int(time * 2) % 4)), 1 + 1 * y + 16 * y, 16, 16));
-            }
-            else if (aux == 380  aux == 404) {
-                this->drawImage(tileSet, n * 16, m * 16, Area(1 + 1 * (x + (int(time * 3) % 4)) + 16 * (x + (int(time * 3) % 4)), 1 + 1 * y + 16 * y, 16, 16));
-            }
-            else {*/
-                this->drawImage(tileSet, n * 8, m * 8, Area(x*8, y*8, 8, 8));
-            //}
+            this->drawImage(tileSet, n * 8, m * 8, Area(x*8, y*8, 8, 8));
         }
     }
 };
