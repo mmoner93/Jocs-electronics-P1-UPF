@@ -51,6 +51,7 @@ class myGameData {
 public:
     myMap world;
     myPlayer player;
+    float time;
     int demoactive = 0;
     int isplaying = 0;
 };

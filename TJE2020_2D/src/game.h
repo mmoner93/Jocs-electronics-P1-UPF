@@ -46,6 +46,7 @@ public:
     Image intro0;
     Image intro1;
     Image intro2;
+    Image winimg;
     
 	//audio
 	Synth synth;

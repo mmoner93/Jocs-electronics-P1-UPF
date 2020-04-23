@@ -46,6 +46,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
     intro0.loadTGA("data/pantalla1.tga"); //example to load an sprite
     intro1.loadTGA("data/pantalla2.tga"); //example to load an sprite
     intro2.loadTGA("data/pantalla3.tga"); //example to load an sprite
+    winimg.loadTGA("data/win.tga"); //example to load an sprite
 	//bgmap.loadTGA("data/lvl1.tga");
     intro.loadTGA("data/introcastle.tga");
     tiles.loadTGA("data/DungeonTileset.tga");

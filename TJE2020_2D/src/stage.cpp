@@ -523,20 +523,21 @@ void IntroStage::render(Image& fb,  myGameData& currentGame) {
     fb.fill(Color::BLACK);
     if (count == 0){
         fb.drawImage(Game::instance->intro0, 0, 0, 160, 120);
-        fb.drawText("The most important thing in the life", 10, 80, Game::instance->minifontb,4,6);
-        fb.drawText("of a sock is to live with your partner.", 5, 90, Game::instance->minifontb,4,6);
+        fb.drawText("The most important thing in the life", 10, 90, Game::instance->minifontb,4,6);
+        fb.drawText("of a sock is to live with your partner.", 5, 100, Game::instance->minifontb,4,6);
         fb.drawText("Press Z to continue", 50, 110, Game::instance->minifontb,4,6);
     }
     else if (count == 1){
         fb.drawImage(Game::instance->intro1, 0, 0, 160, 120);
-        fb.drawText("But a day after a washing machine", 15, 80, Game::instance->minifontb,4,6);
-        fb.drawText("Harby realized that he was lost.", 20, 90, Game::instance->minifontb,4,6);
+        fb.drawText("But a day after a laundry", 30, 20, Game::instance->minifontb,4,6);
+        fb.drawText("Harvey realized that he was lost.", 20, 30, Game::instance->minifontb,4,6);
         fb.drawText("Press Z to continue", 50, 110, Game::instance->minifontb,4,6);
     }
     else if (count == 2){ //Harby has to find his partner again to be together
         fb.drawImage(Game::instance->intro2, 0, 0, 160, 120);
-        fb.drawText("Harby has to find his partner", 20, 80, Game::instance->minifontb,4,6);
-        fb.drawText("again to be together.", 30, 90, Game::instance->minifontb,4,6);
+        fb.drawText("Harvey has to find", 70, 75, Game::instance->minifontb,4,6);
+        fb.drawText("his partner again", 70, 85, Game::instance->minifontb,4,6);
+        fb.drawText("to be together.", 70, 95, Game::instance->minifontb,4,6);
         fb.drawText("Press Z to continue", 50, 110, Game::instance->minifontb,4,6);
     }
     else{
@@ -672,6 +673,7 @@ void MenuStage::update(double seconds_elapsed, myGameData& currentGame) {
         menupos += 1;
     }
     if (Input::wasKeyPressed(SDL_SCANCODE_Z)) {
+        currentGame.time = Game::instance->time;
         if (menupos == 0) {
             SaveLoad::saveGameInfo(currentGame);
         }
@@ -818,14 +820,20 @@ void Win::render(Image& fb,  myGameData& currentGame) {
     //fb.fill(Color(0,0,0,130));
     //Stage::s_stages["play"]->render(fb, currentGame);
     fb.fillBlend(Color(0,0,0,180));
-    fb.drawRectangle(20, 20, 119, 42, Color(200, 200, 200, 230));
-    fb.drawText("    You Win ", 50, 50, Game::instance->minifont,4,6);
-    fb.drawText("Z - To Restart", 50, 95, Game::instance->minifont,4,6);
+    fb.drawImage(Game::instance->winimg, 0, 0);
+    fb.drawRectangle(20, 20, 119, 30, Color(200, 200, 200, 230));
+    fb.drawImage( Game::instance->sprite, currentGame.player.actualpos.x-15, currentGame.player.actualpos.y + 20, Area((int (Game::instance->time * 6) % 4) * 14,0,14,18) );
+    fb.drawImage( Game::instance->sprite, currentGame.player.actualpos.x, currentGame.player.actualpos.y + 20, Area((int ((Game::instance->time * 6) + 1) % 4) * 14,0,14,18) );
+    fb.drawText("Now Harvey and Harry are", 20, 20, Game::instance->minifontb,4,6);
+    fb.drawText("together and happy ever after",20, 30, Game::instance->minifontb,4,6);
+    fb.drawText("Time to complete " + toString(time),30, 45, Game::instance->minifontb,4,6);
+    fb.drawText("Z - To Restart", 50, 105, Game::instance->minifont,4,6);
 }
 
 void Win::update(double seconds_elapsed, myGameData& currentGame) {
     if (isplaying == 0) {
         Game::instance->synth.playSample("data/victori.wav", 1, false);
+        time = Game::instance->time - currentGame.time;
         isplaying = 1;
     }
     
