@@ -523,11 +523,11 @@ void IntroStage::render(Image& fb,  myGameData& currentGame) {
     fb.fill(Color::BLACK);
     fb.drawImage(Game::instance->intro, 0, 30, 160, 120);
     fb.drawText("Sock Mate", 50, 10, Game::instance->font);
-    fb.drawText("Press A to start", 50, 50, Game::instance->minifont,4,6);
+    fb.drawText("Press Z to start", 50, 50, Game::instance->minifont,4,6);
 }
 
 void IntroStage::update(double seconds_elapsed, myGameData& currentGame) {
-    if (Input::wasKeyPressed(SDL_SCANCODE_A)) {
+    if (Input::wasKeyPressed(SDL_SCANCODE_Z)) {
         changeStage("intromenu");
     }
     if (currentGame.isplaying == 0) {
@@ -548,10 +548,10 @@ void PlayStage::render(Image& fb, myGameData& currentGame) {
 void PlayStage::update(double seconds_elapsed, myGameData& currentGame) {
     Game::instance->synth.samples_playback->stop();
     currentGame.isplaying = 0;
-    if (Input::wasKeyPressed(SDL_SCANCODE_P)) {
+    if (Input::wasKeyPressed(SDL_SCANCODE_R)) {
         changeStage("intro");
     }
-    if (Input::wasKeyPressed(SDL_SCANCODE_M)) {
+    if (Input::wasKeyPressed(SDL_SCANCODE_X)) {
         changeStage("menu");
     }
     int speed = 80;
@@ -597,7 +597,7 @@ void PlayStage::update(double seconds_elapsed, myGameData& currentGame) {
     else {
         currentGame.player.camfinpos = currentGame.player.camerapos;
     }
-    if (Input::wasKeyPressed(SDL_SCANCODE_A)) {
+    if (Input::wasKeyPressed(SDL_SCANCODE_Z)) {
           
           if (chest(currentGame)) {
               cout << "is chest" << Game::instance->time <<  endl;
@@ -647,7 +647,7 @@ void MenuStage::update(double seconds_elapsed, myGameData& currentGame) {
         SaveLoad::saveGameInfo(currentGame);
         menupos += 1;
     }
-    if (Input::wasKeyPressed(SDL_SCANCODE_A)) {
+    if (Input::wasKeyPressed(SDL_SCANCODE_Z)) {
         if (menupos == 0) {
             SaveLoad::saveGameInfo(currentGame);
         }
@@ -712,7 +712,7 @@ void IntroMenuStage::update(double seconds_elapsed, myGameData& currentGame) {
     if (Input::wasKeyPressed(SDL_SCANCODE_DOWN)) {
         menupos += 1;
     }
-    if (Input::wasKeyPressed(SDL_SCANCODE_A)) {
+    if (Input::wasKeyPressed(SDL_SCANCODE_Z)) {
         if (menupos == 0) {
             SaveLoad::init(currentGame, 0);
             Game::instance->bgmap = Game::instance->bghouse;
@@ -760,10 +760,10 @@ void Dialog::render(Image& fb,  myGameData& currentGame) {
 
 void Dialog::update(double seconds_elapsed, myGameData& currentGame) {
 
-    if (Input::wasKeyPressed(SDL_SCANCODE_S)) {
+    if (Input::wasKeyPressed(SDL_SCANCODE_X)) {
         changeStage("play");
     }
-    if (Input::wasKeyPressed(SDL_SCANCODE_A)) {
+    if (Input::wasKeyPressed(SDL_SCANCODE_Z)) {
         cout << "key a " << endl;
     }
 }
@@ -796,7 +796,7 @@ void Win::render(Image& fb,  myGameData& currentGame) {
     fb.fillBlend(Color(0,0,0,180));
     fb.drawRectangle(20, 20, 119, 42, Color(200, 200, 200, 230));
     fb.drawText("    You Win ", 50, 50, Game::instance->minifont,4,6);
-    fb.drawText("A - To Restart", 50, 95, Game::instance->minifont,4,6);
+    fb.drawText("Z - To Restart", 50, 95, Game::instance->minifont,4,6);
 }
 
 void Win::update(double seconds_elapsed, myGameData& currentGame) {
@@ -805,7 +805,7 @@ void Win::update(double seconds_elapsed, myGameData& currentGame) {
         isplaying = 1;
     }
     
-    if (Input::wasKeyPressed(SDL_SCANCODE_A)) {
+    if (Input::wasKeyPressed(SDL_SCANCODE_Z)) {
         SaveLoad::init(currentGame, 0);
         changeStage("intro");
         isplaying = 0;
