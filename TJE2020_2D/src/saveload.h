@@ -13,6 +13,7 @@ using namespace std;
 
 class SaveLoad {
 public:
+    myGameData backup;
     static void saveGameInfo(myGameData& currentGame);
     static bool loadGameInfo(myGameData& currentGame);
     static int * readCSV(string filesrc, int size);

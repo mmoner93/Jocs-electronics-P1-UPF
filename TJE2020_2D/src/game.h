@@ -35,6 +35,7 @@ public:
     //images
     Image intro;
     Image font;
+    Image minifontb;
     Image minifont;
     Image sprite;
     unsigned int w = 960;
@@ -42,6 +43,9 @@ public:
     Image bgdemo;
     Image bghouse;
     Image tiles;
+    Image intro0;
+    Image intro1;
+    Image intro2;
     
 	//audio
 	Synth synth;

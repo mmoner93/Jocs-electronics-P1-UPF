@@ -40,8 +40,12 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	elapsed_time = 0.0f;
 
 	font.loadTGA("data/bitmap-font-white.tga"); //load bitmap-font image
+    minifontb.loadTGA("data/mini-font-black-4x6.tga"); //load bitmap-font image
 	minifont.loadTGA("data/mini-font-white-4x6.tga"); //load bitmap-font image
 	sprite.loadTGA("data/spritesheet.tga"); //example to load an sprite
+    intro0.loadTGA("data/pantalla1.tga"); //example to load an sprite
+    intro1.loadTGA("data/pantalla2.tga"); //example to load an sprite
+    intro2.loadTGA("data/pantalla3.tga"); //example to load an sprite
 	//bgmap.loadTGA("data/lvl1.tga");
     intro.loadTGA("data/introcastle.tga");
     tiles.loadTGA("data/DungeonTileset.tga");

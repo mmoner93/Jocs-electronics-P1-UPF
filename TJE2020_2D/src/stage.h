@@ -35,6 +35,7 @@ public:
 class IntroStage : public Stage
 {
 public:
+    int count = 0;
     IntroStage() : Stage("intro"){}
     void render(Image& fb, myGameData& currentGame);
     void update(double seconds_elapsed, myGameData& currentGame);

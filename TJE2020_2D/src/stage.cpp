@@ -521,14 +521,38 @@ Stage::Stage(const char* name) {
 
 void IntroStage::render(Image& fb,  myGameData& currentGame) {
     fb.fill(Color::BLACK);
-    fb.drawImage(Game::instance->intro, 0, 30, 160, 120);
-    fb.drawText("Sock Mate", 50, 10, Game::instance->font);
-    fb.drawText("Press Z to start", 50, 50, Game::instance->minifont,4,6);
+    if (count == 0){
+        fb.drawImage(Game::instance->intro0, 0, 0, 160, 120);
+        fb.drawText("The most important thing in the life", 10, 80, Game::instance->minifontb,4,6);
+        fb.drawText("of a sock is to live with your partner.", 5, 90, Game::instance->minifontb,4,6);
+        fb.drawText("Press Z to continue", 50, 110, Game::instance->minifontb,4,6);
+    }
+    else if (count == 1){
+        fb.drawImage(Game::instance->intro1, 0, 0, 160, 120);
+        fb.drawText("But a day after a washing machine", 15, 80, Game::instance->minifontb,4,6);
+        fb.drawText("Harby realized that he was lost.", 20, 90, Game::instance->minifontb,4,6);
+        fb.drawText("Press Z to continue", 50, 110, Game::instance->minifontb,4,6);
+    }
+    else if (count == 2){ //Harby has to find his partner again to be together
+        fb.drawImage(Game::instance->intro2, 0, 0, 160, 120);
+        fb.drawText("Harby has to find his partner", 20, 80, Game::instance->minifontb,4,6);
+        fb.drawText("again to be together.", 30, 90, Game::instance->minifontb,4,6);
+        fb.drawText("Press Z to continue", 50, 110, Game::instance->minifontb,4,6);
+    }
+    else{
+        fb.drawImage(Game::instance->intro, 0, 30, 160, 120);
+        fb.drawText("Lost Sock", 50, 10, Game::instance->font);
+        fb.drawText("Press Z to start", 50, 50, Game::instance->minifont,4,6);
+    }
 }
 
 void IntroStage::update(double seconds_elapsed, myGameData& currentGame) {
     if (Input::wasKeyPressed(SDL_SCANCODE_Z)) {
-        changeStage("intromenu");
+        count += 1;
+        if (count == 4) {
+            count = 0;
+            changeStage("intromenu");
+        }
     }
     if (currentGame.isplaying == 0) {
         Game::instance->synth.playSample("data/music.wav", 0.2, true);
@@ -620,7 +644,7 @@ void MenuStage::render(Image& fb,  myGameData& currentGame) {
     Stage::s_stages["play"]->render(fb, currentGame);
     fb.fillBlend(Color(0,0,0,180));
     fb.drawLine(50, menupos*15+57, 115, menupos*15+57, Color::YELLOW);
-    fb.drawText("Sock Mate Menu", 30, 10, Game::instance->font);
+    fb.drawText("Lost Sock Menu", 30, 10, Game::instance->font);
     fb.drawText("    Save Game", 50, 50, Game::instance->minifont,4,6);
     fb.drawText("    Load Game", 50, 65, Game::instance->minifont,4,6);
     fb.drawText("    Exit menu", 50, 80, Game::instance->minifont,4,6);
@@ -686,7 +710,7 @@ void IntroMenuStage::render(Image& fb,  myGameData& currentGame) {
     Stage::s_stages["play"]->render(fb, currentGame);
     fb.fillBlend(Color(0,0,0,180));
     fb.drawLine(50, menupos*15+57, 115, menupos*15+57, Color::YELLOW);
-    fb.drawText("Sock Mate Menu", 30, 10, Game::instance->font);
+    fb.drawText("Lost Sock Menu", 30, 10, Game::instance->font);
     fb.drawText("    New  Game ", 50, 50, Game::instance->minifont,4,6);
     fb.drawText("    Load Game ", 50, 65, Game::instance->minifont,4,6);
     fb.drawText("       DEMO   ", 50, 80, Game::instance->minifont,4,6);

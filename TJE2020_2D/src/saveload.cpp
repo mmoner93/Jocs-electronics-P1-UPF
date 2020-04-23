@@ -61,6 +61,9 @@ void SaveLoad::init(myGameData& currentGame, int u)
         currentGame.player.camfinpos = Vector2(40, 140);
         std::memmove(&currentGame.world.mapa, SaveLoad::readCSV("data/house.csv", 14400), 14400 * sizeof(int));
         std::memmove(&currentGame.world.obj, SaveLoad::readCSV("data/obj.csv", 14400), 14400 * sizeof(int));
+        for (int i = 0; i<25; i++) {
+            currentGame.player.myobj[i] = NOTHING;
+        }
         for (int n = 0; n < 120; n++) {
             for (int m = 0; m < 120; m++) {
                 if (currentGame.world.obj[m * 120 + n] == TELEPORT) {
@@ -190,6 +193,9 @@ void SaveLoad::init(myGameData& currentGame, int u)
         currentGame.player.camfinpos = Vector2(300, 500);
        std::memmove(&currentGame.world.demo, SaveLoad::readCSV("data/demo.csv", 14400), 14400 * sizeof(int));
        std::memmove(&currentGame.world.objdemo, SaveLoad::readCSV("data/demo_obj.csv", 14400), 14400 * sizeof(int));
+        for (int i = 0; i<25; i++) {
+            currentGame.player.myobj[i] = NOTHING;
+        }
         for (int n = 0; n < 120; n++) {
             for (int m = 0; m < 120; m++) {
                 if (currentGame.world.objdemo[m * 120 + n] == TELEPORT) {
